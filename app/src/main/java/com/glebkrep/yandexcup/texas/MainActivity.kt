@@ -12,6 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.glebkrep.yandexcup.texas.ui.Screen
+import com.glebkrep.yandexcup.texas.ui.pages.addnew.AddNewObjectPage
+import com.glebkrep.yandexcup.texas.ui.pages.home.HomePage
+import com.glebkrep.yandexcup.texas.ui.pages.previous.PreviousObjectsPage
 import com.glebkrep.yandexcup.texas.ui.theme.TexasTheme
 //Вы оказались в Техасе после очередного сильного урагана.
 //Администрация штата поручила вам разработать приложение для
@@ -57,9 +60,14 @@ class MainActivity : ComponentActivity() {
                         navController = mainNavController,
                         startDestination = Screen.Home.route
                     ) {
-                        composable(Screen.Home.route) { HomePage() }
-                        composable(Screen.PreviousObjects.route) { BreathingPage() }
-                        composable(Screen.AddNewObject.route) { StatsPage() }
+                        composable(Screen.Home.route) { HomePage(toAddNewObjects = {
+                            mainNavController.navigate(Screen.AddNewObject.route)
+                        },
+                        toScannedObjects = {
+                            mainNavController.navigate(Screen.PreviousObjects.route)
+                        }) }
+                        composable(Screen.PreviousObjects.route) { PreviousObjectsPage() }
+                        composable(Screen.AddNewObject.route) { AddNewObjectPage() }
                     }
                 }
             }
