@@ -71,10 +71,11 @@ fun ObjectDataItem(objectData: ObjectData, onClick: (ObjectData) -> (Unit)) {
     ) {
         Column {
             Text(text = "Сообщение ${objectData.id}", Modifier.padding(4.dp))
-            for (item in objectData.objects) {
-                Text(text = "${item.type.label}:${item.count}", Modifier.padding(4.dp))
-            }
+            Text(text = "${objectData.`object`.type.label}:${objectData.`object`.count}", Modifier.padding(4.dp))
         }
-        Text(text = if (objectData.isSent) "Отправлено!" else "Не отправлено!",color = if (objectData.isSent) Color.Green else Color.Red)
+        Text(
+            text = if (objectData.isSent) "Отправлено!" else "Не отправлено!",
+            color = if (objectData.isSent) Color.Green else Color.Red
+        )
     }
 }

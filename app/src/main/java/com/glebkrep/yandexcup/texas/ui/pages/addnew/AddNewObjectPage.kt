@@ -4,9 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -19,12 +17,11 @@ import com.glebkrep.yandexcup.texas.data.*
 import com.glebkrep.yandexcup.texas.utils.getActivity
 
 @Composable
-fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel()) {
-    var powerPylonCount by remember { mutableStateOf(0) }
-    var streetLightCount by remember { mutableStateOf(0) }
-    var treeCount by remember { mutableStateOf(0) }
-    var mailBoxCount by remember { mutableStateOf(0) }
-    var hydrantsCount by remember { mutableStateOf(0) }
+fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel(), onSent: () -> (Unit)) {
+    var count by remember { mutableStateOf(0) }
+    var itemType by remember {
+        mutableStateOf(ItemType.tree)
+    }
 
     val geoPoint by addNewObjectVM.location.observeAsState(LatLon())
     var geoError by remember {
@@ -32,10 +29,22 @@ fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel()) {
     }
 
     val internetStatus by addNewObjectVM.internetStatus.observeAsState(InternetStatus.NO_INTERNET)
-
+    var expanded by remember { mutableStateOf(false) }
     var submitError by remember {
         mutableStateOf("")
     }
+    val allTypes by remember {
+        mutableStateOf(
+            listOf(
+                ItemType.tree,
+                ItemType.streetlight,
+                ItemType.mailbox,
+                ItemType.mailbox,
+                ItemType.power_pylon
+            )
+        )
+    }
+
     val context = LocalContext.current
 
     val withPadding = Modifier.padding(8.dp)
@@ -47,45 +56,34 @@ fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Какие объекты вы хотите отметить?", withPadding)
-        ItemWithCounter(
-            itemName = ItemType.power_pylon.label,
-            itemCount = powerPylonCount,
-            changingQuantity = {
-                submitError = ""
-                powerPylonCount += it
-            }, withPadding
+        Text(text = "Какой объект вы хотите отметить?", withPadding)
+        Button(
+            onClick = { expanded = !expanded },
+            withPadding
+        ) {
+            Text(text = "Выбрать объект")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }, content = {
+                allTypes.forEach { type ->
+                    DropdownMenuItem(onClick = {
+                        itemType = type
+                        expanded = !expanded
+                    }) {
+                        Text(text = type.label)
+                    }
+                }
+            }, modifier = withPadding.align(Alignment.CenterHorizontally)
         )
+
+
         ItemWithCounter(
-            itemName = ItemType.streetlight.label,
-            itemCount = streetLightCount,
+            itemName = itemType.label,
+            itemCount = count,
             changingQuantity = {
                 submitError = ""
-                streetLightCount += it
-            }, withPadding
-        )
-        ItemWithCounter(
-            itemName = ItemType.tree.label,
-            itemCount = treeCount,
-            changingQuantity = {
-                submitError = ""
-                treeCount += it
-            }, withPadding
-        )
-        ItemWithCounter(
-            itemName = ItemType.mailbox.label,
-            itemCount = mailBoxCount,
-            changingQuantity = {
-                submitError = ""
-                mailBoxCount += it
-            }, withPadding
-        )
-        ItemWithCounter(
-            itemName = ItemType.hydrant.label,
-            itemCount = hydrantsCount,
-            changingQuantity = {
-                submitError = ""
-                hydrantsCount += it
+                count += it
             }, withPadding
         )
         Divider(withPadding, color = Color.Black, thickness = 2.dp)
@@ -112,16 +110,18 @@ fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel()) {
         Button(onClick = {
             submitError = ""
             val mObject = getObject(
-                powerPylonCnt = powerPylonCount,
-                streetLightCnt = streetLightCount,
-                treeCnt = treeCount,
-                mailBoxCnt = mailBoxCount,
-                hydrantCnt = hydrantsCount,
+                count = count,
+                itemType = itemType,
                 geo = geoPoint
             ) {
                 submitError = it
             } ?: return@Button
-            addNewObjectVM.addObject(mObject, internetStatus,context.getActivity()?:return@Button)
+            addNewObjectVM.addObject(
+                mObject,
+                internetStatus,
+                context.getActivity() ?: return@Button
+            )
+            onSent.invoke()
         }) {
             Text(
                 text = if (internetStatus is InternetStatus.OK) "Отправить и сохранить" else "Сохранить",
@@ -135,11 +135,8 @@ fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel()) {
 }
 
 private fun getObject(
-    powerPylonCnt: Int,
-    streetLightCnt: Int,
-    treeCnt: Int,
-    mailBoxCnt: Int,
-    hydrantCnt: Int,
+    count: Int,
+    itemType: ItemType,
     geo: LatLon,
     onError: (String) -> (Unit)
 ): ObjectData? {
@@ -147,30 +144,13 @@ private fun getObject(
         onError.invoke("Сначала обнои геолокацию")
         return null
     }
-    if ((powerPylonCnt + streetLightCnt + treeCnt + mailBoxCnt + hydrantCnt) == 0) {
+    if (count == 0) {
         onError.invoke("Выбери хотя бы один объект")
         return null
     }
-    val listObjects = listOf(
-        com.glebkrep.yandexcup.texas.data.Object(
-            ItemType.power_pylon, powerPylonCnt
-        ),
-        com.glebkrep.yandexcup.texas.data.Object(
-            ItemType.hydrant, hydrantCnt
-        ),
-        com.glebkrep.yandexcup.texas.data.Object(
-            ItemType.mailbox, mailBoxCnt
-        ),
-        com.glebkrep.yandexcup.texas.data.Object(
-            ItemType.tree, treeCnt
-        ),
-        com.glebkrep.yandexcup.texas.data.Object(
-            ItemType.streetlight, streetLightCnt
-        )
-    ).filter { it.count != 0 }
     return ObjectData(
         location = geo,
-        objects = listObjects
+        `object` = com.glebkrep.yandexcup.texas.data.Object(itemType, count)
     )
 }
 

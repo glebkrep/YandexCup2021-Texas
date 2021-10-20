@@ -4,15 +4,9 @@
     "lon": 30.505444
   },
   "objects": {
-    "object": [
-      {
-        "type": "hydrant",
-        "count": 1
-      },
-      {
-        "type": "mailbox",
-        "count": 1
-      }
-    ]
+    "object": {
+      "type": "tree",
+      "count": 2
+    }
   }
 }

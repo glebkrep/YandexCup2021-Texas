@@ -9,7 +9,7 @@ data class ObjectDataForSending(
 )
 @Serializable
 data class ObjectForSending(
-    val `object`:List<TypeCountForSending>
+    val `object`:TypeCountForSending
 )
 @Serializable
 data class TypeCountForSending(

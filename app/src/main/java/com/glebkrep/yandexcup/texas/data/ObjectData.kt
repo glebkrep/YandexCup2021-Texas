@@ -11,7 +11,7 @@ data class ObjectData(
     var id:Int = 0,
     @ColumnInfo(name = "location")
     val location:LatLon,
-    val objects:List<Object>,
+    val `object`:Object,
     @ColumnInfo(name = "is_sent")
     var isSent:Boolean = false
 )

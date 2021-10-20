@@ -18,17 +18,11 @@ fun CharSequence?.isValidEmail() =
     !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 fun ObjectData.toJsonString(): String {
-    val objectItems: MutableList<TypeCountForSending> = mutableListOf()
-    for (mObject in this.objects) {
-        objectItems.add(
-            TypeCountForSending(
-                type = mObject.type.name,
-                count = mObject.count
-            )
-        )
-    }
     val objectForSending = ObjectForSending(
-        `object` = objectItems
+        `object` = TypeCountForSending(
+            type = this.`object`.type.name,
+            count = this.`object`.count
+        )
     )
     val objectDataForSending = ObjectDataForSending(
         coordinates = this.location,

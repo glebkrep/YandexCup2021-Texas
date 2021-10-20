@@ -67,7 +67,9 @@ class MainActivity : ComponentActivity() {
                             mainNavController.navigate(Screen.PreviousObjects.route)
                         }) }
                         composable(Screen.PreviousObjects.route) { PreviousObjectsPage() }
-                        composable(Screen.AddNewObject.route) { AddNewObjectPage() }
+                        composable(Screen.AddNewObject.route) { AddNewObjectPage(){
+                            mainNavController.popBackStack()
+                        } }
                     }
                 }
             }
