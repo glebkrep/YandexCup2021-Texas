@@ -53,7 +53,7 @@ class AddNewObjectPageVM(application: Application) : AndroidViewModel(applicatio
     fun getGeo(activity: Activity, failedToGetGeo: (String) -> (Unit)) {
         val fusedLocationClient = FusedLocationProviderClient(activity)
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            val latLon = LatLon(lon = location.longitude, lat = location.latitude)
+            val latLon = LatLon(lon = location.longitude.toFloat(), lat = location.latitude.toFloat())
             _location.postValue(latLon)
         }.addOnFailureListener {
             Debug.log("Failed to get geo")

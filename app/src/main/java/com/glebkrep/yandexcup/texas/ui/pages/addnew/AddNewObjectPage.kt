@@ -143,7 +143,7 @@ private fun getObject(
     geo: LatLon,
     onError: (String) -> (Unit)
 ): ObjectData? {
-    if (geo.lat == 0.0 && geo.lon == 0.0) {
+    if (geo.lat == 0.0f && geo.lon == 0.0f) {
         onError.invoke("Сначала обнои геолокацию")
         return null
     }

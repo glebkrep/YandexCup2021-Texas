@@ -1,0 +1,18 @@
+{
+  "coordinates": {
+    "lat": 59.917023,
+    "lon": 30.505444
+  },
+  "objects": {
+    "object": [
+      {
+        "type": "hydrant",
+        "count": 1
+      },
+      {
+        "type": "mailbox",
+        "count": 1
+      }
+    ]
+  }
+}

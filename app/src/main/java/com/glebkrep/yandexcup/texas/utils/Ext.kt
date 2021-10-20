@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.util.Patterns
-import com.glebkrep.yandexcup.texas.data.ObjectData
+import com.glebkrep.yandexcup.texas.data.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 fun Context.getActivity(): Activity? = when (this) {
     is Activity -> this
@@ -12,9 +14,25 @@ fun Context.getActivity(): Activity? = when (this) {
     else -> null
 }
 
-fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+fun CharSequence?.isValidEmail() =
+    !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
-fun ObjectData.toJsonString():String{
-    //todo to json string
-    return ""
+fun ObjectData.toJsonString(): String {
+    val objectItems: MutableList<TypeCountForSending> = mutableListOf()
+    for (mObject in this.objects) {
+        objectItems.add(
+            TypeCountForSending(
+                type = mObject.type.name,
+                count = mObject.count
+            )
+        )
+    }
+    val objectForSending = ObjectForSending(
+        `object` = objectItems
+    )
+    val objectDataForSending = ObjectDataForSending(
+        coordinates = this.location,
+        objects = objectForSending
+    )
+    return Json.encodeToString(objectDataForSending)
 }

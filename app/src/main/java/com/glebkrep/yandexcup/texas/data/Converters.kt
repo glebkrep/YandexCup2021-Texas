@@ -39,6 +39,6 @@ class Converters {
     @TypeConverter
     fun fromString(value: String): LatLon {
         val data = value.split(":")
-        return LatLon(lat = data.first().toDouble(), lon = data[1].toDouble())
+        return LatLon(lat = data.first().toFloat(), lon = data[1].toFloat())
     }
 }

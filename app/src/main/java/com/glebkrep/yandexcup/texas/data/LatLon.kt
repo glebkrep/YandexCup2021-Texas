@@ -1,8 +1,11 @@
 package com.glebkrep.yandexcup.texas.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class LatLon(
-    val lat: Double = 0.0,
-    val lon: Double = 0.0
+    val lat: Float = 0.0f,
+    val lon: Float = 0.0f
 )
 
 val LatLon.readableString:String
