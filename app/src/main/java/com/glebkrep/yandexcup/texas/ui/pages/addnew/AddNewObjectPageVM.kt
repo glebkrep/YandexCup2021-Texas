@@ -10,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.glebkrep.yandexcup.texas.data.InternetStatus
 import com.glebkrep.yandexcup.texas.data.LatLon
 import com.glebkrep.yandexcup.texas.data.ObjectData
+import com.glebkrep.yandexcup.texas.data.repository.ObjectDataRepository
+import com.glebkrep.yandexcup.texas.data.repository.ObjectDataRoomDatabase
 import com.glebkrep.yandexcup.texas.utils.Debug
 import com.glebkrep.yandexcup.texas.utils.SharePreferences
 import com.glebkrep.yandexcup.texas.utils.Utils
@@ -25,19 +27,20 @@ class AddNewObjectPageVM(application: Application) : AndroidViewModel(applicatio
     private val _internetStatus: MutableLiveData<InternetStatus> = MutableLiveData()
     val internetStatus: LiveData<InternetStatus> = _internetStatus
 
+    private var objectDataRepository: ObjectDataRepository? = null
+
     init {
+        viewModelScope.launch(Dispatchers.IO) {
+            objectDataRepository = ObjectDataRepository(
+                ObjectDataRoomDatabase.getDatabase(getApplication()).objectDataDao()
+            )
+        }
         checkInternet()
     }
 
     private fun checkInternet() {
         viewModelScope.launch(Dispatchers.IO) {
-            val isInternetOk = try {
-                val ipAddr: InetAddress = InetAddress.getByName("google.com")
-                !ipAddr.equals("")
-            } catch (e: Exception) {
-                Debug.log("isInternetAvailable() Exception:${e.message} ${e}")
-                false
-            }
+            val isInternetOk = Utils.isInternetOk()
             if (isInternetOk) {
                 _internetStatus.postValue(InternetStatus.OK)
             } else {
@@ -71,12 +74,16 @@ class AddNewObjectPageVM(application: Application) : AndroidViewModel(applicatio
 
     private fun saveLocally(mObject: ObjectData) {
         mObject.isSent = false
-        //todo save to db
+        viewModelScope.launch(Dispatchers.IO) {
+            objectDataRepository?.insert(mObject)
+        }
     }
 
     private fun saveAndSend(mObject: ObjectData, activity: Activity, email: String) {
         mObject.isSent = true
-        //todo save to db
+        viewModelScope.launch(Dispatchers.IO) {
+            objectDataRepository?.insert(mObject)
+        }
         Utils.sendEmailWithData(email, mObject, activity)
     }
 

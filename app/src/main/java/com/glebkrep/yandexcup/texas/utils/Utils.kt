@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import com.glebkrep.yandexcup.texas.data.ObjectData
+import java.net.InetAddress
 
 object Utils {
     fun sendEmailWithData(
@@ -28,6 +29,16 @@ object Utils {
         try {
             activity.startActivity(Intent.createChooser(emailIntent, "Send email..."))
         } catch (ex: ActivityNotFoundException) {
+        }
+    }
+
+    fun isInternetOk():Boolean{
+        return try {
+            val ipAddr: InetAddress = InetAddress.getByName("google.com")
+            !ipAddr.equals("")
+        } catch (e: Exception) {
+            Debug.log("isInternetAvailable() Exception:${e.message} ${e}")
+            false
         }
     }
 }
