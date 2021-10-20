@@ -38,7 +38,7 @@ fun AddNewObjectPage(addNewObjectVM: AddNewObjectPageVM = viewModel(), onSent: (
             listOf(
                 ItemType.tree,
                 ItemType.streetlight,
-                ItemType.mailbox,
+                ItemType.hydrant,
                 ItemType.mailbox,
                 ItemType.power_pylon
             )
